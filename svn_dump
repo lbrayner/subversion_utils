@@ -3,8 +3,8 @@
 # set -x
 
 print_usage() {
-	printf '\n%s\n' "$(basename $0) [-h] [-d FOLDER] [-c CLASSIFIER] [-p TEMPDIR]\
- [-- ARGS...]"
+	printf '\n%s\n' "$(basename $0) [-h] -r REPOSITORY [-d FOLDER] [-c CLASSIFIER]\
+ [-p TEMPDIR] [-- ARGS...]"
 }
 
 generate_timestamp(){
@@ -14,13 +14,14 @@ generate_timestamp(){
 dump_pack(){
 
     name="${1}"
-    shift 1
+    repo="${2}"
+    shift 2
 
     dirname_dump_file="$(mktemp -d -p "${tmpdir}")"
     dump_file="${dirname_dump_file}/${name}"
     basename_dump_file="${name}"
     target_zip_file="${destination}/${name}.zip"
-    svnadmin dump "${@}" > "${dump_file}"
+    svnadmin dump "${repo}" "${@}" > "${dump_file}"
     cd "${dirname_dump_file}"
     zip "${target_zip_file}" "${basename_dump_file}"
     cd -
@@ -35,11 +36,15 @@ fi
 
 classifier=""
 destination="."
+repository=""
 tmpdir="/tmp"
 
-while getopts ":hc:d:p:" opt
+while getopts ":h:r:c:d:p:" opt
 do
     case ${opt} in
+        r)
+            repository="${OPTARG}"
+            ;;
         c)
             classifier="${OPTARG}"
             ;;
@@ -61,12 +66,18 @@ shift $((OPTIND - 1))
 
 destination="$(readlink -f "${destination}")"
 
+if [ -z "${repository}" ]
+then
+    printf 'Repository required.\n' 1>&2
+    exit 1
+fi
+
 if [ ! -d "${destination}" ]
 then
-    printf '%s%s%s not a folder.\n' \' "${destination}" \'
+    printf '%s%s%s not a folder.\n' \' "${destination}" \' 1>&2
     exit 1
 fi
 
 name="svn_dump${classifier}$(generate_timestamp).dump"
 
-dump_pack "${name}" "${@}"
+dump_pack "${name}" "${repository}" "${@}"
