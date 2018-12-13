@@ -78,6 +78,7 @@ then
     exit 1
 fi
 
-name="svn_dump${classifier}$(generate_timestamp).dump"
+youngest=`svnlook youngest "${repository}"`
+name="svn_dump${classifier}_r_${youngest}_$(generate_timestamp).dump"
 
 dump_pack "${name}" "${repository}" "${@}"
