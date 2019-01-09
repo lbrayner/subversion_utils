@@ -1,0 +1,88 @@
+#!/bin/sh
+
+# set -x
+
+print_usage() {
+	printf '\n%s\n' "$(basename $0) [-h] -r URL [-d FOLDER] [-c CLASSIFIER]\
+ [-p TEMPDIR] [-- ARGS...]"
+}
+
+generate_timestamp(){
+    date +'%Y%m%d_%H%M_%N'
+}
+
+dump_pack(){
+
+    name="${1}"
+    repo="${2}"
+    shift 2
+
+    dirname_dump_file="$(mktemp -d -p "${tmpdir}")"
+    dump_file="${dirname_dump_file}/${name}"
+    basename_dump_file="${name}"
+    target_zip_file="${destination}/${name}.zip"
+    svn log "${repo}" "${@}" > "${dump_file}"
+    cd "${dirname_dump_file}"
+    zip "${target_zip_file}" "${basename_dump_file}"
+    cd -
+    rm -rf "${dirname_dump_file}"
+}
+
+if [ ! ${#} -gt 0 ]
+then
+	print_usage
+	exit 1
+fi
+
+classifier=""
+destination="."
+url=""
+tmpdir="/tmp"
+
+while getopts ":h:r:c:d:p:" opt
+do
+    case ${opt} in
+        r)
+            url="${OPTARG}"
+            ;;
+        c)
+            classifier="${OPTARG}"
+            ;;
+        d)
+            destination="${OPTARG}"
+            ;;
+        p)
+            tmpdir="${OPTARG}"
+            ;;
+        h)
+            print_usage
+            exit 0
+            ;;
+        \?)
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+if [ "${1}" = "--" ]
+then
+    shift
+fi
+
+destination="$(readlink -f "${destination}")"
+
+if [ -z "${url}" ]
+then
+    printf 'url required.\n' 1>&2
+    exit 1
+fi
+
+if [ ! -d "${destination}" ]
+then
+    printf '%s%s%s not a folder.\n' \' "${destination}" \' 1>&2
+    exit 1
+fi
+
+name="svn_log_dump${classifier}$(generate_timestamp).log"
+
+dump_pack "${name}" "${url}" "${@}"
