@@ -79,6 +79,6 @@ then
 fi
 
 youngest=`svnlook youngest "${repository}"`
-name="svn_dump${classifier}r_${youngest}_$(generate_timestamp).dump"
+name="svn_dump_$(generate_timestamp)${classifier}r_${youngest}.dump"
 
 dump_pack "${name}" "${repository}" "${@}"
