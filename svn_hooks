@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+set -e
+
+exec_svn(){
+    svn "${@}"
+}
+
+svn_pre_update(){
+   git-commit "svn pre-update"
+}
+
+svn_post_update(){
+    git-commit "svn update"
+}
+
+svn_post_commit(){
+    git-commit "svn commit"
+}
+
+svn_update(){
+    svn_pre_update
+    exec_svn "${@}"
+    svn_post_update
+}
+
+svn_commit(){
+    exec_svn "${@}"
+    svn_post_commit
+}
+
+svn_command=${1}
+
+case ${svn_command} in
+    commit|ci) svn_commit "${@}"; ;;
+    update|up) svn_update "${@}"; ;;
+    blame|praise|annotate|ann) svimnannotate "${@}"; ;;
+    *) svn "${@}" ;;
+esac
