@@ -34,8 +34,8 @@ then
     exit 1
 fi
 
-extension_left=`get_extension "${path_left}"`
-extension_right=`get_extension "${path_right}"`
+extension_left=$(get_extension "${path_left}")
+extension_right=$(get_extension "${path_right}")
 
 diff_arguments_size="$((${#} - 6))"
 diff_arguments="${@:1:${diff_arguments_size}}"
@@ -64,6 +64,20 @@ printf 'Editor is: "%s".\n\n' "${vim}"
 file_left="${@: -2:1}"
 file_right="${@: -1}"
 
+get_syntax(){
+    case ${1} in
+        jrxml)
+            echo "xml"
+            ;;
+        *)
+            echo ${1}
+            ;;
+    esac
+}
+
+syntax_left=$(get_syntax ${extension_left})
+syntax_right=$(get_syntax ${extension_right})
+
 make_temp_copy(){
     name="${1##*/}"
     name_no_tabs="${name//	/ }"
@@ -83,5 +97,5 @@ then
 fi
 
 "${vim}" -d "${file_left}" "${file_right}"\
-    -c "${diffopt}"'silent! set syntax='"${extension_left}"' | wincmd w '\
-'| silent! set syntax='"${extension_right}"
+    -c "${diffopt}"'silent! set syntax='${syntax_left}' | wincmd w '\
+'| silent! set syntax='${syntax_right}
