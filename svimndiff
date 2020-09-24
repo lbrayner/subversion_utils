@@ -26,11 +26,6 @@ get_extension(){
     echo "${extension_only}"
 }
 
-# get_revision(){
-#     revision="${1##*	}"
-#     echo "${revision}"
-# }
-
 path_left="${@: -5:1}"
 path_right="${@: -3:1}"
 
@@ -46,7 +41,6 @@ extension_right=$(get_extension "${path_right}")
 diff_arguments_size="$((${#} - 6))"
 diff_arguments="${@:1:${diff_arguments_size}}"
 
-# diffopt=""
 diffopt="set diffopt-=iwhite"
 
 if [[ "${diff_arguments}" == "-w" || \
@@ -54,7 +48,6 @@ if [[ "${diff_arguments}" == "-w" || \
       "${extension_left}" == "java" && "${extension_right}" == "java" ]]
 then
     printf '\nIgnoring whitespace.\n'
-    # diffopt="set diffopt+=iwhite |"
     diffopt="set diffopt+=iwhite"
 fi
 
@@ -72,20 +65,6 @@ printf 'Editor is: "%s".\n\n' "${vim}"
 file_left="${@: -2:1}"
 file_right="${@: -1}"
 
-# get_syntax(){
-#     case ${1} in
-#         jrxml)
-#             echo "xml"
-#             ;;
-#         *)
-#             echo ${1}
-#             ;;
-#     esac
-# }
-
-# syntax_left=$(get_syntax ${extension_left})
-# syntax_right=$(get_syntax ${extension_right})
-
 make_temp_copy(){
     path="${1}"
     file="${2}"
@@ -93,7 +72,6 @@ make_temp_copy(){
     revision="${path##*	}"
     path_no_extension="${path%%.*}"
     name_no_extension="${path_no_extension##*/}"
-    # name_no_tabs="${name//	/ }"
     temp_file="$(mktemp -d)/${name_no_extension} ${revision}.${extension}"
     cp -f "${file}" "${temp_file}"
     echo "${temp_file}"
@@ -109,9 +87,4 @@ then
     file_right="$(make_temp_copy "${path_right}" "${file_right}")"
 fi
 
-# "${vim}" -d "${file_left}" "${file_right}"\
-#     -c "${diffopt}"'silent! set syntax='${syntax_left}' | wincmd w '\
-# '| silent! set syntax='${syntax_right}
-
-"${vim}" -d "${file_left}" "${file_right}"\
-    -c "${diffopt}"' | wincmd w '
+"${vim}" -d "${file_left}" "${file_right}" -c "${diffopt}"' | wincmd w'
