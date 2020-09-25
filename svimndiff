@@ -87,4 +87,9 @@ then
     file_right="$(make_temp_copy "${path_right}" "${file_right}")"
 fi
 
-"${vim}" -d "${file_left}" "${file_right}" -c "${diffopt}"' | wincmd w'
+tmpdir="$(dirname "$(mktemp -u)")"
+
+"${vim}" --cmd "autocmd VimEnter * noautocmd windo \
+    if expand('%:p') =~# '^\\V' . '${tmpdir}' | \
+        setlocal nomodifiable | endif" \
+        -d "${file_left}" "${file_right}" -c "${diffopt}"' | wincmd w'
