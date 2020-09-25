@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -x
+# set -x
 # echo "${@}"
 
 config_dir=""
@@ -72,7 +72,7 @@ make_temp_copy(){
     revision="${path##*	}"
     path_no_extension="${path%%.*}"
     name_no_extension="${path_no_extension##*/}"
-    temp_file="$(mktemp -d)/${name_no_extension} ${revision}.${extension}"
+    temp_file="$(mktemp -d)/${revision} ${name_no_extension}.${extension}"
     cp -f "${file}" "${temp_file}"
     echo "${temp_file}"
 }
