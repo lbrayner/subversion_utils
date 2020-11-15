@@ -4,7 +4,7 @@
 # echo "${@}"
 
 print_usage() {
-	printf '\n%s\n' "$(basename $0) OLD HIS MINE MERGED WCPATH"
+    echo -e "\n$(basename $0) OLD HIS MINE MERGED WCPATH"
 }
 
 if [[ ! ${#} -eq 5 ]]
@@ -35,7 +35,7 @@ vim=/usr/bin/vim
 if [[ "${EDITOR}" != "${EDITOR%%vim}" ]]
 then
     vim="${EDITOR}"
-    printf 'Editor is: "%s".\n\n' "${vim}"
+    echo -e "Editor is: ${vim}\n"
 fi
 
 extension="${merged##*.}"
@@ -45,7 +45,7 @@ diffopt=""
 
 if [[ "${extension}" = "java" ]]
 then
-    printf '\nIgnoring whitespace.\n\n'
+    echo -e "Ignoring whitespace.\n"
     diffw="$(mktemp)"
     chmod +x "${diffw}"
     echo 'diff -w "${@}"' > "${diffw}"
