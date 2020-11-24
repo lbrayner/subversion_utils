@@ -43,7 +43,7 @@ diff_program=diff
 diffw=""
 diffopt=""
 
-if [[ "${extension}" = "java" ]]
+if [[ "${extension}" == "java" ]]
 then
     echo -e "Ignoring whitespace.\n"
     diffw="$(mktemp)"
