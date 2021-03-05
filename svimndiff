@@ -22,6 +22,8 @@ is_under_version_control(){
 get_extension(){
     path="${1}"
     extension_revision="${path##*.}"
+    # File doesn't have an extension
+    [[ "${path}" == "${extension_revision}" ]] && return
     extension_only="${extension_revision%%	*}"
     echo "${extension_only}"
 }
@@ -79,10 +81,12 @@ make_temp_copy(){
     path="${1}"
     file="${2}"
     extension=$(get_extension "${path}")
+    [[ -n "${extension}" ]] && extension=".${extension}"
     revision="${path##*	}"
-    path_no_extension="${path%%.*}"
+    path_no_revision="${path%%	*}"
+    path_no_extension="${path_no_revision%%.*}"
     name_no_extension="${path_no_extension##*/}"
-    temp_file="$(mktemp -d)/${revision} ${name_no_extension}.${extension}"
+    temp_file="$(mktemp -d)/${revision} ${name_no_extension}${extension}"
     cp -f "${file}" "${temp_file}"
     echo "${temp_file}"
 }
